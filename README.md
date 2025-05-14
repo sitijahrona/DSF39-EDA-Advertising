@@ -21,9 +21,9 @@ Proyek ini merupakan studi Exploratory Data Analysis (EDA) terhadap dataset Adve
 
 # 📁 Struktur Proyek
 - Advertising_EDA.ipynb               (Notebook analisis EDA)
-- advertising2.csv                    (Dataset mentah)
 - PPT Tugas DSF 39 Advertising        (File presentasi (slide))
 - README.md                           (Dokumentasi proyek ini)
+- advertising2.csv                    (Dataset mentah)
 
 # 📷 Contoh Visualisasi
 - Scatter plot + regresi antara TV, Radio, Newspaper vs Sales
