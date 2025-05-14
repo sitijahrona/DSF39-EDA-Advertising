@@ -1,0 +1,183 @@
+# Load Data
+
+#syntax menggunakan Pandas
+import pandas as pd
+
+from google.colab import drive
+drive.mount('/content/gdrive/', force_remount=True)
+
+# Tanpa delimiter=';', pandas akan mengira itu semua hanya 1 kolom karena tidak ada koma.
+df = pd.read_csv('/content/gdrive/MyDrive/advertising2.csv' , delimiter=';')
+df
+
+# Mengganti nama tiap kolom
+df = df.rename(columns={
+  'radio': 'Radio',
+  'newspaper': 'Newspaper', 'sales':'Sales'
+})
+
+# Pre-processing data
+
+df.info()
+
+Missing value
+
+# menggunakan isnull() untuk melihat nilai yang kosong
+df.isnull()
+
+# cari nilai yang kosong
+df.isnull().sum()
+
+# isi missing values dengan nilai mean
+df['Radio'] = df['Radio'].fillna(df['Radio'].mean())
+df['Newspaper'] = df['Newspaper'].fillna(df['Newspaper'].mean())
+
+df.isnull().sum()
+
+duplikasi data
+
+# melihat baris yang duplikat
+df.duplicated()
+
+
+df.duplicated().sum()
+
+# Hapus data yang duplikat
+df = df.drop_duplicates()
+
+# Cek data yang duplikat lagi
+df.duplicated().sum()
+
+Cek outlier
+
+def cek_outlier_iqr(df, kolom):
+    Q1 = df[kolom].quantile(0.25)
+    Q3 = df[kolom].quantile(0.75)
+    IQR = Q3 - Q1
+
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+
+    outliers = df[(df[kolom] < lower_bound) | (df[kolom] > upper_bound)]
+
+    print(f"\n📌 Kolom: {kolom}")
+    print(f"Jumlah outlier: {len(outliers)}")
+    return outliers
+
+
+cek_outlier_iqr(df, 'TV')
+cek_outlier_iqr(df, 'Radio')
+cek_outlier_iqr(df, 'Newspaper')
+
+median_value = df['Newspaper'].median()
+df.loc[[16, 101], 'Newspaper'] = median_value
+
+
+def cek_outlier_iqr(df, kolom):
+    Q1 = df[kolom].quantile(0.25)
+    Q3 = df[kolom].quantile(0.75)
+    IQR = Q3 - Q1
+
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+
+    outliers = df[(df[kolom] < lower_bound) | (df[kolom] > upper_bound)]
+
+    print(f"\n📌 Kolom: {kolom}")
+    print(f"Jumlah outlier: {len(outliers)}")
+    return outliers
+
+
+cek_outlier_iqr(df, 'TV')
+cek_outlier_iqr(df, 'Radio')
+cek_outlier_iqr(df, 'Newspaper')
+
+# Features
+features = ['TV', 'radio', 'newspaper']
+
+# Target Variable
+target = 'Sales'
+
+import numpy as np
+import scipy.stats as sp
+import matplotlib.pyplot as plt
+import seaborn as sns
+import statsmodels.formula.api as smf
+import statsmodels.stats.api as sms
+
+g = sns.pairplot(
+    df,
+    x_vars=['TV', 'Radio', 'Newspaper'],
+    y_vars='Sales',
+    height=4,
+    aspect=1,
+    kind='reg',
+    plot_kws={
+        'scatter_kws': {'color': 'blue'},  # Scatter points in blue
+        'line_kws': {'color': 'red'}       # Regression line in red
+    }
+)
+
+g.fig.suptitle('Variable Trends - TV/Radio/Newspaper', y=1.05)
+plt.show()
+
+Kesimpulan: TV berkorelasi kuat, positif, dan linear dengan variabel target. Koran terlihat tidak berkorelasi.
+
+# Analisis data & Visualisasi Data
+
+# Statistik deskriptif
+df.describe()
+
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+g = sns.pairplot(
+    df,
+    x_vars=['TV', 'Radio', 'Newspaper'],
+    y_vars='Sales',
+    height=4,
+    aspect=1,
+    kind='reg',
+    plot_kws={
+        'scatter_kws': {'color': 'blue'},  # Scatter points in blue
+        'line_kws': {'color': 'red'}       # Regression line in red
+    }
+)
+
+g.fig.suptitle('Variable Trends - TV/Radio/Newspaper', y=1.05)
+plt.show()
+
+# Korelasi dan heatmap
+corr = df.corr()
+
+plt.figure(figsize=(8, 6))
+sns.heatmap(corr, annot=True, cmap='coolwarm')
+plt.title('Matriks Korelasi')
+plt.show()
+
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(6,4))
+sns.histplot(data=df, x='TV', bins=20, kde=True)
+plt.title('Distribusi Pengeluaran Iklan TV')
+plt.xlabel('TV')
+plt.ylabel('Jumlah')
+plt.show()
+
+plt.figure(figsize=(6,4))
+sns.histplot(data=df, x='Radio', bins=20, kde=True)
+plt.title('Distribusi Pengeluaran Iklan Radio')
+plt.xlabel('Radio')
+plt.ylabel('Jumlah')
+plt.show()
+
+
+plt.figure(figsize=(6,4))
+sns.histplot(data=df, x='Newspaper', bins=20, kde=True)
+plt.title('Distribusi Pengeluaran Iklan Newspaper')
+plt.xlabel('Newspaper')
+plt.ylabel('Jumlah')
+plt.show()
